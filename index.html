@@ -699,25 +699,29 @@
         num:   'CAPA 01 / 04',
         name:  'CAPTURA\nDE SEÑALES',
         desc:  'Monitoreo en tiempo real de plataformas\ndigitales, redes sociales y ecosistemas de medios.',
-        color: [0, 36, 83], // UCSP azul oscuro #002453
+        color:         [0, 36, 83],     // UCSP azul oscuro #002453 (brand ref)
+        particleColor: [60, 140, 240],  // brightened so particles read on black
       },
       {
         num:   'CAPA 02 / 04',
         name:  'INTELIGENCIA\nDE MERCADO',
         desc:  'Cruce de datos multi-fuente, análisis de\ncompetencia y detección de oportunidades.',
-        color: [0, 59, 122], // UCSP azul medio #003B7A
+        color:         [0, 59, 122],    // UCSP azul medio #003B7A
+        particleColor: [80, 165, 245],
       },
       {
         num:   'CAPA 03 / 04',
         name:  'ACTIVACIÓN\nESTRATÉGICA',
         desc:  'Transformación de insights en decisiones\naccionables y tácticas de alta precisión.',
-        color: [107, 27, 61], // UCSP borgoña #6B1B3D — color marca
+        color:         [107, 27, 61],   // UCSP borgoña #6B1B3D — color marca
+        particleColor: [220, 95, 145],
       },
       {
         num:   'CAPA 04 / 04',
         name:  'PERFORMANCE\nY OPTIMIZACIÓN',
         desc:  'Medición continua, aprendizaje adaptativo\ny ciclos de mejora basados en evidencia.',
-        color: [197, 165, 114], // UCSP dorado #C5A572 — cierre premium
+        color:         [197, 165, 114], // UCSP dorado #C5A572 — cierre
+        particleColor: [225, 200, 140],
       },
     ],
 
@@ -1024,7 +1028,7 @@
     // typing time + breathing room before exit
     const twHold = layer.desc.length * 0.022 + 1.2;
 
-    tl.call(() => { canvasColor = layer.color; }) // sync color with canvas draw loop
+    tl.call(() => { canvasColor = layer.particleColor || layer.color; }) // brightened canvas tone
       .set(`#l${n}`, { opacity: 1 })
       .to(`#l${n} .l-num`, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' })
       .to(`#al${n}`,       { width: 48,  duration: 0.5,  ease: 'power3.out' }, '-=0.2')

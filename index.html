@@ -364,37 +364,41 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      margin-bottom: 36px;
+      gap: clamp(18px, 2.5vw, 28px);
+      margin-bottom: 44px;
       opacity: 0;
     }
     .f-logo-img {
-      width: 80px; height: auto;
-      opacity: 0.65;
+      width: clamp(120px, 14vw, 180px);
+      height: auto;
+      opacity: 1;
     }
     .f-logo-dot {
-      width: 5px; height: 5px;
+      width: 8px; height: 8px;
       background: var(--accent);
       border-radius: 50%;
+      flex-shrink: 0;
     }
     .f-logo-text {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.35em;
-      color: rgba(255,255,255,0.4);
+      font-family: var(--display);
+      font-size: clamp(36px, 4.6vw, 56px);
+      letter-spacing: 0.06em;
+      color: var(--white);
       text-transform: uppercase;
+      line-height: 1;
     }
     .f-welcome {
       font-family: var(--body);
-      font-size: clamp(14px, 1.8vw, 17px);
+      font-size: clamp(16px, 2vw, 20px);
       font-weight: 300;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0.03em;
-      margin-bottom: 36px;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.02em;
+      margin-bottom: 40px;
       opacity: 0;
-      line-height: 1.6;
+      line-height: 1.55;
+      max-width: 720px;
     }
-    .f-welcome strong { color: var(--white); font-weight: 400; }
+    .f-welcome strong { color: var(--white); font-weight: 500; }
 
     /* ── COUNTERS ── */
     .f-counters {
@@ -459,7 +463,9 @@
     /* ── MOBILE ── */
     @media (max-width: 767px) {
       .l-name { font-size: clamp(40px, 11vw, 72px); }
-      .f-logo-img { width: 60px; }
+      .f-logo-img { width: 100px; }
+      .f-logo-text { font-size: 32px; }
+      .f-logo-row { gap: 14px; }
       .f-counters { gap: 20px; }
       .f-cnt-num  { font-size: 38px; }
       .f-btn      { padding: 16px 32px; font-size: 10px; }

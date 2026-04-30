@@ -147,12 +147,17 @@
     }
     .g-eyebrow {
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 12px;
+      font-weight: 700;
       letter-spacing: 0.45em;
-      color: rgba(255,255,255,0.3);
+      color: var(--white);
       text-transform: uppercase;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       opacity: 0;
+    }
+    .g-eyebrow .g-author {
+      color: var(--accent);
+      font-weight: 700;
     }
     .g-logo {
       opacity: 0;
@@ -160,7 +165,7 @@
       text-align: center;
     }
     .g-logo-img {
-      width: clamp(100px, 12vw, 160px);
+      width: clamp(200px, 26vw, 360px);
       height: auto;
       display: block;
     }
@@ -476,15 +481,15 @@
 <!-- ── GATE ── -->
 <div id="gate">
   <div class="g-divider" id="g-div"></div>
-  <div class="g-eyebrow" id="g-ey">THE LAB · Wanted</div>
+  <div class="g-eyebrow" id="g-ey"><span class="g-author">THE LAB</span> · <span class="g-author">WANTED</span></div>
   <div class="g-logo" id="g-logo">
     <img
-      src="assets/images/wanted-blanco.png"
-      alt="Wanted"
+      src="assets/images/UCSP Blanco.png"
+      alt="Universidad Católica de San Pablo"
       class="g-logo-img"
       onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
     />
-    <span class="g-logo-fallback">WANTED</span>
+    <span class="g-logo-fallback">UCSP</span>
   </div>
   <div class="g-sub" id="g-sub">Market &amp; Social Intelligence</div>
   <button class="g-btn" id="g-btn" onclick="startSequence()">

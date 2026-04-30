@@ -259,7 +259,11 @@
       font-size: clamp(56px, 9.5vw, 118px);
       line-height: 0.88;
       color: var(--white);
-      margin-bottom: 28px;
+      /* Padding extends the overflow:hidden clip box so diacritics (Ó, É, Ñ)
+         on uppercase glyphs don't get cropped. Negative margin keeps the
+         visual position unchanged. */
+      padding: 0.22em 0 0.08em;
+      margin: -0.22em 0 calc(28px - 0.08em);
       overflow: hidden;
       position: relative;
     }
@@ -874,7 +878,7 @@
       .set(`#l${n}`, { opacity: 1 })
       .to(`#l${n} .l-num`, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' })
       .to(`#al${n}`,       { width: 48,  duration: 0.5,  ease: 'power3.out' }, '-=0.2')
-      .to(`#ln${n}`,       { y: '0%',   duration: 0.9,  ease: 'power4.out', force3D: true }, '-=0.2')
+      .to(`#ln${n}`,       { yPercent: 0, duration: 0.9, ease: 'power4.out', force3D: true }, '-=0.2')
       .call(() => {
         gsap.set(`#ld${n}`, { opacity: 1, y: 0 });
         const el = document.getElementById(`ld${n}`);
@@ -894,6 +898,18 @@
   }
 
   function runLayerSequence() {
+    // Pre-warm: explicitly seed every layer's initial state with force3D so
+    // the compositor promotes them upfront. Avoids first-frame jank when a
+    // layer is first touched.
+    CONFIG.layers.forEach((_, idx) => {
+      const n = idx + 1;
+      gsap.set(`#l${n}`,                { opacity: 0, force3D: true });
+      gsap.set(`#l${n} .l-num`,         { opacity: 0, y: 16, force3D: true });
+      gsap.set(`#al${n}`,               { width: 0 });
+      gsap.set(`#l${n} .l-name-inner`, { yPercent: 110, force3D: true });
+      gsap.set(`#l${n} .l-desc`,        { opacity: 0, y: 12, force3D: true });
+    });
+
     const master = gsap.timeline({
       onComplete: () => {
         cancelAnimationFrame(animFrameId);
@@ -901,11 +917,13 @@
       },
     });
 
-    // Estimated total: ~22s accounting for typewriter durations
-    gsap.to('#progress', { width: '100%', duration: 22, ease: 'none' });
+    // Estimated total: ~20s accounting for typewriter durations + overlap
+    gsap.to('#progress', { width: '100%', duration: 20, ease: 'none' });
 
+    // Slight crossfade between layers so any single-frame jank at the
+    // boundary is masked by the next layer's intro already in motion.
     for (let n = 1; n <= CONFIG.layers.length; n++) {
-      master.add(buildLayerTL(n));
+      master.add(buildLayerTL(n), n === 1 ? 0 : '-=0.3');
     }
 
     master.to('#flash', { opacity: 1, duration: 0.12, ease: 'none' });

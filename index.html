@@ -269,8 +269,10 @@
     }
     .l-name-inner {
       display: block;
-      transform: translateY(110%);
       will-change: transform;
+      /* Initial yPercent:110 is set via GSAP pre-warm. Avoid declaring a
+         CSS translateY here — it stacks with GSAP's yPercent and the title
+         ends up double-offset out of the overflow:hidden clip. */
     }
     .l-desc {
       font-family: var(--mono);
@@ -327,11 +329,7 @@
       position: fixed; inset: 0;
       z-index: 300;
       display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       background: var(--black);
-      text-align: center;
       overflow: hidden;
     }
     #final-canvas {
@@ -340,17 +338,83 @@
       opacity: 0.7;
     }
     .f-content {
-      position: relative;
+      position: absolute; inset: 0;
       z-index: 2;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(80px, 10vh, 140px) 24px;
+      text-align: center;
     }
+
+    /* ── DOSSIER FRAME ── */
+    .f-corner {
+      position: absolute;
+      width: 28px; height: 28px;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .f-corner::before,
+    .f-corner::after {
+      content: '';
+      position: absolute;
+      background: rgba(232,255,77,0.55);
+    }
+    .f-corner::before { width: 100%; height: 1px; }
+    .f-corner::after  { width: 1px;  height: 100%; }
+    .f-corner-tl { top: 28px;    left: 28px; }
+    .f-corner-tl::before { top: 0; left: 0; }
+    .f-corner-tl::after  { top: 0; left: 0; }
+    .f-corner-tr { top: 28px;    right: 28px; }
+    .f-corner-tr::before { top: 0; right: 0; }
+    .f-corner-tr::after  { top: 0; right: 0; }
+    .f-corner-bl { bottom: 28px; left: 28px; }
+    .f-corner-bl::before { bottom: 0; left: 0; }
+    .f-corner-bl::after  { bottom: 0; left: 0; }
+    .f-corner-br { bottom: 28px; right: 28px; }
+    .f-corner-br::before { bottom: 0; right: 0; }
+    .f-corner-br::after  { bottom: 0; right: 0; }
+
+    /* Top status meta strips */
+    .f-meta {
+      position: absolute;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 3;
+      opacity: 0;
+    }
+    .f-meta-left  { top: 36px; left:  72px; }
+    .f-meta-right { top: 36px; right: 72px; }
+    .f-meta-dot {
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(232,255,77,0.7);
+      animation: f-pulse 1.6s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .f-meta-sep { color: rgba(255,255,255,0.2); }
+    @keyframes f-pulse {
+      0%, 100% { opacity: 1;    transform: scale(1); }
+      50%      { opacity: 0.35; transform: scale(0.75); }
+    }
+
+    /* Eyebrow + hero title */
     .f-eyebrow {
       font-family: var(--mono);
       font-size: 10px;
-      letter-spacing: 0.5em;
+      letter-spacing: 0.6em;
       color: var(--accent);
       text-transform: uppercase;
-      margin-bottom: 16px;
+      margin-bottom: 22px;
       opacity: 0;
     }
     #f-title {
@@ -358,31 +422,69 @@
       font-size: clamp(64px, 12vw, 148px);
       line-height: 0.85;
       color: var(--white);
-      margin-bottom: 10px;
+      margin: 0;
       display: block;
       letter-spacing: 0.02em;
+      padding: 0.08em 0;
     }
     #f-title .ch {
       display: inline-block;
       opacity: 0;
       transform: translateY(80px);
+      will-change: transform, opacity;
     }
     #f-title .space { display: inline-block; width: 0.25em; }
+
+    /* Accent line under hero */
+    .f-line {
+      width: 0;
+      max-width: 540px;
+      height: 1px;
+      background: var(--accent);
+      margin: 30px auto 34px;
+      opacity: 0.55;
+    }
+
+    /* Dedication */
+    .f-dedication {
+      margin-bottom: 48px;
+      opacity: 0;
+    }
+    .f-ded-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.5em;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .f-ded-name {
+      font-family: var(--display);
+      font-size: clamp(28px, 3.8vw, 48px);
+      letter-spacing: 0.04em;
+      color: var(--white);
+      line-height: 1.05;
+      padding: 0 24px;
+      max-width: 18ch;
+      margin: 0 auto;
+    }
+
+    /* Author mark */
     .f-logo-row {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: clamp(18px, 2.5vw, 28px);
-      margin-bottom: 44px;
+      margin-bottom: 38px;
       opacity: 0;
     }
     .f-logo-img {
-      width: clamp(120px, 14vw, 180px);
+      width: clamp(60px, 6.5vw, 90px);
       height: auto;
       opacity: 1;
     }
     .f-logo-dot {
-      width: 8px; height: 8px;
+      width: 6px; height: 6px;
       background: var(--accent);
       border-radius: 50%;
       flex-shrink: 0;
@@ -395,32 +497,31 @@
       text-transform: uppercase;
       line-height: 1;
     }
-    .f-welcome {
-      font-family: var(--body);
-      font-size: clamp(16px, 2vw, 20px);
-      font-weight: 300;
-      color: rgba(255,255,255,0.55);
-      letter-spacing: 0.02em;
-      margin-bottom: 40px;
-      opacity: 0;
-      line-height: 1.55;
-      max-width: 720px;
-    }
-    .f-welcome strong { color: var(--white); font-weight: 500; }
 
-    /* ── COUNTERS ── */
+    /* ── COUNTERS (system metrics strip) ── */
     .f-counters {
       display: flex;
-      gap: clamp(28px, 5vw, 64px);
+      gap: 0;
       justify-content: center;
-      margin-bottom: 48px;
-      opacity: 0;
+      margin-bottom: 52px;
     }
     .f-counter {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      padding: 4px clamp(28px, 4.5vw, 56px);
+      position: relative;
+      opacity: 0;
+    }
+    .f-counter:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 14%;
+      bottom: 14%;
+      width: 1px;
+      background: rgba(255,255,255,0.13);
     }
     .f-cnt-num {
       font-family: var(--display);
@@ -434,8 +535,8 @@
     .f-cnt-label {
       font-family: var(--mono);
       font-size: 9px;
-      letter-spacing: 0.28em;
-      color: rgba(255,255,255,0.28);
+      letter-spacing: 0.32em;
+      color: rgba(255,255,255,0.32);
       text-transform: uppercase;
     }
 
@@ -471,11 +572,25 @@
     /* ── MOBILE ── */
     @media (max-width: 767px) {
       .l-name { font-size: clamp(40px, 11vw, 72px); }
-      .f-logo-img { width: 100px; }
-      .f-logo-text { font-size: 32px; }
-      .f-logo-row { gap: 14px; }
-      .f-counters { gap: 20px; }
+      .f-corner { width: 18px; height: 18px; }
+      .f-corner-tl, .f-corner-tr { top: 18px; }
+      .f-corner-bl, .f-corner-br { bottom: 18px; }
+      .f-corner-tl, .f-corner-bl { left: 18px; }
+      .f-corner-tr, .f-corner-br { right: 18px; }
+      .f-meta { font-size: 9px; letter-spacing: 0.18em; gap: 8px; }
+      .f-meta-left  { top: 22px; left: 22px; }
+      .f-meta-right { top: 22px; right: 22px; }
+      .f-meta-hide-mobile { display: none; }
+      .f-content { padding: 70px 18px; }
+      .f-line { max-width: 280px; margin: 22px auto 26px; }
+      .f-ded-name { font-size: clamp(22px, 6vw, 32px); }
+      .f-dedication { margin-bottom: 36px; }
+      .f-counters { margin-bottom: 40px; }
+      .f-counter { padding: 4px 14px; }
       .f-cnt-num  { font-size: 38px; }
+      .f-logo-img { width: 56px; }
+      .f-logo-text { font-size: 32px; }
+      .f-logo-row { gap: 14px; margin-bottom: 32px; }
       .f-btn      { padding: 16px 32px; font-size: 10px; }
       .g-btn      { padding: 14px 36px; }
     }
@@ -520,9 +635,33 @@
 <!-- ── FINAL ── -->
 <div id="final">
   <canvas id="final-canvas"></canvas>
+
+  <span class="f-corner f-corner-tl"></span>
+  <span class="f-corner f-corner-tr"></span>
+  <span class="f-corner f-corner-bl"></span>
+  <span class="f-corner f-corner-br"></span>
+
+  <div class="f-meta f-meta-left" id="f-meta-l">
+    <span class="f-meta-dot"></span>
+    <span>SISTEMA ACTIVO</span>
+    <span class="f-meta-sep f-meta-hide-mobile">·</span>
+    <span class="f-meta-hide-mobile">UCSP–001</span>
+  </div>
+  <div class="f-meta f-meta-right" id="f-meta-r">
+    <span id="f-clock">--:--:--</span>
+    <span class="f-meta-sep f-meta-hide-mobile">·</span>
+    <span class="f-meta-hide-mobile" id="f-date">--</span>
+  </div>
+
   <div class="f-content">
-    <div class="f-eyebrow" id="f-ey">Bienvenida,</div>
+    <div class="f-eyebrow" id="f-ey">BIENVENIDA</div>
     <div id="f-title"></div>
+    <div class="f-line" id="f-line"></div>
+    <div class="f-dedication" id="f-ded">
+      <div class="f-ded-label">ENTREGADO A</div>
+      <div class="f-ded-name" id="f-ded-name"></div>
+    </div>
+    <div class="f-counters" id="f-counters"></div>
     <div class="f-logo-row" id="f-logos">
       <img
         src="assets/images/wanted-blanco.png"
@@ -533,8 +672,6 @@
       <div class="f-logo-dot"></div>
       <span class="f-logo-text">THE LAB</span>
     </div>
-    <div class="f-welcome" id="f-welcome"></div>
-    <div class="f-counters" id="f-counters"></div>
     <a class="f-btn" id="f-btn" target="_blank" rel="noopener">
       ACCEDER AL SISTEMA &nbsp;→
     </a>
@@ -587,9 +724,7 @@
 
   // ── DOM POPULATION FROM CONFIG ──
   document.getElementById('f-btn').href = CONFIG.algorithmUrl;
-
-  document.getElementById('f-welcome').innerHTML =
-    `<strong>${CONFIG.client}</strong> ya forma parte del sistema.`;
+  document.getElementById('f-ded-name').textContent = CONFIG.client;
 
   // Build counter elements
   (function () {
@@ -930,6 +1065,25 @@
     master.to('#flash', { opacity: 0, duration: 0.5 });
   }
 
+  // ── LIVE CLOCK ──
+  // Renders a ticking timestamp in the top-right meta strip. Local time,
+  // updates every second. Idempotent: safe to call multiple times.
+  let clockInterval = null;
+  function startClock() {
+    const clockEl = document.getElementById('f-clock');
+    const dateEl  = document.getElementById('f-date');
+    const months  = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+    const pad = n => String(n).padStart(2, '0');
+    function tick() {
+      const d = new Date();
+      clockEl.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      dateEl.textContent  = `${pad(d.getDate())} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+    tick();
+    if (clockInterval) clearInterval(clockInterval);
+    clockInterval = setInterval(tick, 1000);
+  }
+
   // ── FINAL REVEAL ──
   function showFinal() {
     sequenceRunning = false;
@@ -939,7 +1093,7 @@
     gsap.killTweensOf('#progress');
 
     const finalEl = document.getElementById('final');
-    finalEl.style.display = 'flex';
+    finalEl.style.display = 'block';
 
     // Spawn a lighter particle field behind the final screen
     const fc   = document.getElementById('final-canvas');
@@ -983,25 +1137,57 @@
       titleEl.appendChild(span);
     });
 
-    const tl = gsap.timeline({ delay: 0.4 });
-    tl.to('#f-ey', { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' })
-      .to('.ch', {
+    // Start ticking clock right away (visible once meta strips fade in)
+    startClock();
+
+    // Pre-warm transforms so the cascade is butter-smooth
+    gsap.set('.f-counter', { y: 10, force3D: true });
+
+    const tl = gsap.timeline({ delay: 0.35 });
+
+    // 1. Dossier frame appears first — corners, then meta strips
+    tl.to('.f-corner', {
+        opacity: 1, duration: 0.7, stagger: 0.08, ease: 'power2.out',
+      })
+      .to('#f-meta-l', { opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.4')
+      .to('#f-meta-r', { opacity: 1, duration: 0.5, ease: 'power2.out' }, '<')
+
+      // 2. Eyebrow + hero title
+      .to('#f-ey', { opacity: 1, duration: 0.5, ease: 'power3.out' }, '-=0.2')
+      .to('#f-title .ch', {
         opacity: 1, y: 0,
         duration: 0.6, ease: 'power4.out', stagger: 0.04,
-      }, '-=0.2')
-      .to('#f-logos',    { opacity: 1, duration: 0.5 }, '-=0.1')
-      .to('#f-welcome',  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.2')
-      .to('#f-counters', { opacity: 1, duration: 0.5 }, '-=0.1')
-      .call(() => startCounters())
+      }, '-=0.15')
+
+      // 3. Accent line draws across — the "cut" of the dossier
+      .to('#f-line', {
+        width: '100%',
+        duration: 1.0, ease: 'power3.inOut',
+      }, '-=0.25')
+
+      // 4. Dedication block reveals through the line
+      .to('#f-ded', { opacity: 1, duration: 0.7, ease: 'power3.out' }, '-=0.55')
+
+      // 5. Counters cascade left-to-right + numbers tick up
+      .to('.f-counter', {
+        opacity: 1, y: 0,
+        duration: 0.55, ease: 'power3.out', stagger: 0.1,
+      }, '+=0.1')
+      .call(() => startCounters(), null, '-=0.3')
+
+      // 6. Author mark
+      .to('#f-logos', { opacity: 1, duration: 0.6, ease: 'power3.out' }, '+=0.15')
+
+      // 7. CTA emerges last and starts breathing
       .to('#f-btn', {
-        opacity: 1, duration: 0.6, ease: 'power3.out',
+        opacity: 1, duration: 0.7, ease: 'power3.out',
         onComplete: () => {
           gsap.to('#f-btn', {
             boxShadow: '0 0 40px rgba(232,255,77,0.3)',
             repeat: -1, yoyo: true, duration: 2, ease: 'sine.inOut',
           });
         },
-      }, '-=0.1');
+      }, '-=0.05');
   }
 
   // ── COUNTERS ──

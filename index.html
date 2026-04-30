@@ -147,12 +147,17 @@
     }
     .g-eyebrow {
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 12px;
+      font-weight: 700;
       letter-spacing: 0.45em;
-      color: rgba(255,255,255,0.3);
+      color: var(--white);
       text-transform: uppercase;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       opacity: 0;
+    }
+    .g-eyebrow .g-author {
+      color: var(--accent);
+      font-weight: 700;
     }
     .g-logo {
       opacity: 0;
@@ -160,7 +165,7 @@
       text-align: center;
     }
     .g-logo-img {
-      width: clamp(100px, 12vw, 160px);
+      width: clamp(200px, 26vw, 360px);
       height: auto;
       display: block;
     }
@@ -237,6 +242,7 @@
       opacity: 0;
       pointer-events: none;
       z-index: 2;
+      will-change: transform, opacity;
     }
     .l-num {
       font-family: var(--mono);
@@ -246,19 +252,25 @@
       margin-bottom: 20px;
       opacity: 0;
       transform: translateY(16px);
+      will-change: transform, opacity;
     }
     .l-name {
       font-family: var(--display);
       font-size: clamp(56px, 9.5vw, 118px);
       line-height: 0.88;
       color: var(--white);
-      margin-bottom: 28px;
+      /* Padding extends the overflow:hidden clip box so diacritics (Ó, É, Ñ)
+         on uppercase glyphs don't get cropped. Negative margin keeps the
+         visual position unchanged. */
+      padding: 0.22em 0 0.08em;
+      margin: -0.22em 0 calc(28px - 0.08em);
       overflow: hidden;
       position: relative;
     }
     .l-name-inner {
       display: block;
       transform: translateY(110%);
+      will-change: transform;
     }
     .l-desc {
       font-family: var(--mono);
@@ -270,6 +282,7 @@
       opacity: 0;
       transform: translateY(12px);
       white-space: pre-line;
+      will-change: transform, opacity;
     }
     .l-bg-num {
       position: absolute;
@@ -324,7 +337,7 @@
     #final-canvas {
       position: absolute; inset: 0;
       width: 100%; height: 100%;
-      opacity: 0.4;
+      opacity: 0.7;
     }
     .f-content {
       position: relative;
@@ -359,37 +372,41 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      margin-bottom: 36px;
+      gap: clamp(18px, 2.5vw, 28px);
+      margin-bottom: 44px;
       opacity: 0;
     }
     .f-logo-img {
-      width: 80px; height: auto;
-      opacity: 0.65;
+      width: clamp(120px, 14vw, 180px);
+      height: auto;
+      opacity: 1;
     }
     .f-logo-dot {
-      width: 5px; height: 5px;
+      width: 8px; height: 8px;
       background: var(--accent);
       border-radius: 50%;
+      flex-shrink: 0;
     }
     .f-logo-text {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.35em;
-      color: rgba(255,255,255,0.4);
+      font-family: var(--display);
+      font-size: clamp(36px, 4.6vw, 56px);
+      letter-spacing: 0.06em;
+      color: var(--white);
       text-transform: uppercase;
+      line-height: 1;
     }
     .f-welcome {
       font-family: var(--body);
-      font-size: clamp(14px, 1.8vw, 17px);
+      font-size: clamp(16px, 2vw, 20px);
       font-weight: 300;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0.03em;
-      margin-bottom: 36px;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.02em;
+      margin-bottom: 40px;
       opacity: 0;
-      line-height: 1.6;
+      line-height: 1.55;
+      max-width: 720px;
     }
-    .f-welcome strong { color: var(--white); font-weight: 400; }
+    .f-welcome strong { color: var(--white); font-weight: 500; }
 
     /* ── COUNTERS ── */
     .f-counters {
@@ -454,7 +471,9 @@
     /* ── MOBILE ── */
     @media (max-width: 767px) {
       .l-name { font-size: clamp(40px, 11vw, 72px); }
-      .f-logo-img { width: 60px; }
+      .f-logo-img { width: 100px; }
+      .f-logo-text { font-size: 32px; }
+      .f-logo-row { gap: 14px; }
       .f-counters { gap: 20px; }
       .f-cnt-num  { font-size: 38px; }
       .f-btn      { padding: 16px 32px; font-size: 10px; }
@@ -476,15 +495,15 @@
 <!-- ── GATE ── -->
 <div id="gate">
   <div class="g-divider" id="g-div"></div>
-  <div class="g-eyebrow" id="g-ey">THE LAB · Wanted</div>
+  <div class="g-eyebrow" id="g-ey"><span class="g-author">THE LAB</span> · <span class="g-author">WANTED</span></div>
   <div class="g-logo" id="g-logo">
     <img
-      src="assets/images/wanted-blanco.png"
-      alt="Wanted"
+      src="assets/images/UCSP Blanco.png"
+      alt="Universidad Católica de San Pablo"
       class="g-logo-img"
       onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
     />
-    <span class="g-logo-fallback">WANTED</span>
+    <span class="g-logo-fallback">UCSP</span>
   </div>
   <div class="g-sub" id="g-sub">Market &amp; Social Intelligence</div>
   <button class="g-btn" id="g-btn" onclick="startSequence()">
@@ -526,7 +545,7 @@
   // ── CONFIG ──
   // Update these constants before deploying for each client.
   const CONFIG = {
-    algorithmUrl: 'YOUR_URL_HERE',
+    algorithmUrl: 'https://sanpablo-algorithm-mvp.netlify.app/',
     client: 'Universidad Católica de San Pablo',
 
     layers: [
@@ -723,8 +742,8 @@
       this.y  = Math.random() * (canvas ? canvas.height : window.innerHeight);
       this.vx = (Math.random() - 0.5) * 0.5;
       this.vy = (Math.random() - 0.5) * 0.5;
-      this.r  = Math.random() * 1.2 + 0.3;
-      this.o  = Math.random() * 0.5 + 0.1;
+      this.r  = Math.random() * 1.4 + 0.4;
+      this.o  = Math.random() * 0.55 + 0.25;
     }
     update() {
       this.x += this.vx; this.y += this.vy;
@@ -754,8 +773,8 @@
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(${r},${g},${b},${(1 - d / maxDist) * 0.12})`;
-          ctx.lineWidth   = 0.6;
+          ctx.strokeStyle = `rgba(${r},${g},${b},${(1 - d / maxDist) * 0.22})`;
+          ctx.lineWidth   = 0.7;
           ctx.stroke();
         }
       }
@@ -772,31 +791,47 @@
   }
 
   // ── TYPEWRITER ──
+  // Driven by GSAP/rAF so updates batch with the rest of the frame; avoids
+  // setTimeout drift and per-char DOM insertions that cause layout thrash.
   function typewriter(elId, text, speed) {
-    speed     = speed || 22;
-    const el  = document.createElement('div'); // dummy; we use the real el below
+    speed = speed || 22; // ms per char
     const tgt = document.getElementById(elId);
-    const chars = text.split('');
-    let i = 0;
     tgt.textContent = '';
+
+    const textNode = document.createTextNode('');
+    tgt.appendChild(textNode);
 
     const caret = document.createElement('span');
     caret.className  = 'tw-cursor tw-blink';
     caret.textContent = '▋';
     tgt.appendChild(caret);
 
-    function tick() {
-      if (i < chars.length) {
-        tgt.insertBefore(document.createTextNode(chars[i++]), caret);
-        setTimeout(tick, speed);
-      } else {
-        // Hold cursor visible briefly, then fade it out
-        setTimeout(() => {
-          gsap.to(caret, { opacity: 0, duration: 0.4, onComplete: () => caret.remove() });
-        }, 1200);
-      }
-    }
-    tick();
+    const state = { i: 0 };
+    const total = text.length;
+    let last   = 0;
+
+    const tween = gsap.to(state, {
+      i: total,
+      duration: (total * speed) / 1000,
+      ease: 'none',
+      onUpdate: () => {
+        const n = state.i | 0;
+        if (n !== last) {
+          textNode.data = text.slice(0, n);
+          last = n;
+        }
+      },
+    });
+
+    return {
+      finish: () => {
+        tween.kill();
+        textNode.data = text;
+      },
+      removeCaret: () => {
+        if (caret.parentNode) caret.remove();
+      },
+    };
   }
 
   // ── SEQUENCE ──
@@ -836,28 +871,45 @@
     const layer = CONFIG.layers[n - 1];
     const tl    = gsap.timeline();
 
-    // Typewriter hold: typing time + breathing room before exit
-    const twHold = layer.desc.length * 0.022 + 1.5;
+    // typing time + breathing room before exit
+    const twHold = layer.desc.length * 0.022 + 1.2;
 
     tl.call(() => { canvasColor = layer.color; }) // sync color with canvas draw loop
       .set(`#l${n}`, { opacity: 1 })
       .to(`#l${n} .l-num`, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' })
       .to(`#al${n}`,       { width: 48,  duration: 0.5,  ease: 'power3.out' }, '-=0.2')
-      .to(`#ln${n}`,       { y: '0%',   duration: 0.9,  ease: 'power4.out' }, '-=0.2')
+      .to(`#ln${n}`,       { yPercent: 0, duration: 0.9, ease: 'power4.out', force3D: true }, '-=0.2')
       .call(() => {
         gsap.set(`#ld${n}`, { opacity: 1, y: 0 });
-        typewriter(`ld${n}`, layer.desc);
+        const el = document.getElementById(`ld${n}`);
+        el._tw = typewriter(`ld${n}`, layer.desc);
       }, null, '-=0.1')
       .to({}, { duration: twHold })
-      // Glitch only on desktop — feels wrong on touch screens
-      .call(() => { if (!isMobile) triggerGlitch(`l${n}`); })
-      .to({}, { duration: isMobile ? 0 : 0.12 })
-      .to(`#l${n}`, { opacity: 0, y: -20, duration: 0.55, ease: 'power3.in' });
+      // Clean caret + fire glitch in parallel with exit motion to avoid the
+      // dead beat between "glitch ends" and "exit starts"
+      .call(() => {
+        const el = document.getElementById(`ld${n}`);
+        if (el._tw) { el._tw.finish(); el._tw.removeCaret(); }
+        if (!isMobile) triggerGlitch(`l${n}`);
+      })
+      .to(`#l${n}`, { opacity: 0, y: -16, duration: 0.6, ease: 'power2.inOut', force3D: true });
 
     return tl;
   }
 
   function runLayerSequence() {
+    // Pre-warm: explicitly seed every layer's initial state with force3D so
+    // the compositor promotes them upfront. Avoids first-frame jank when a
+    // layer is first touched.
+    CONFIG.layers.forEach((_, idx) => {
+      const n = idx + 1;
+      gsap.set(`#l${n}`,                { opacity: 0, force3D: true });
+      gsap.set(`#l${n} .l-num`,         { opacity: 0, y: 16, force3D: true });
+      gsap.set(`#al${n}`,               { width: 0 });
+      gsap.set(`#l${n} .l-name-inner`, { yPercent: 110, force3D: true });
+      gsap.set(`#l${n} .l-desc`,        { opacity: 0, y: 12, force3D: true });
+    });
+
     const master = gsap.timeline({
       onComplete: () => {
         cancelAnimationFrame(animFrameId);
@@ -865,11 +917,13 @@
       },
     });
 
-    // Estimated total: ~22s accounting for typewriter durations
-    gsap.to('#progress', { width: '100%', duration: 22, ease: 'none' });
+    // Estimated total: ~20s accounting for typewriter durations + overlap
+    gsap.to('#progress', { width: '100%', duration: 20, ease: 'none' });
 
+    // Slight crossfade between layers so any single-frame jank at the
+    // boundary is masked by the next layer's intro already in motion.
     for (let n = 1; n <= CONFIG.layers.length; n++) {
-      master.add(buildLayerTL(n));
+      master.add(buildLayerTL(n), n === 1 ? 0 : '-=0.3');
     }
 
     master.to('#flash', { opacity: 1, duration: 0.12, ease: 'none' });
@@ -898,8 +952,8 @@
       y:  Math.random() * fc.height,
       vx: (Math.random() - 0.5) * 0.3,
       vy: (Math.random() - 0.5) * 0.3,
-      r:  Math.random() * 1 + 0.3,
-      o:  Math.random() * 0.22 + 0.04,
+      r:  Math.random() * 1.2 + 0.4,
+      o:  Math.random() * 0.4 + 0.15,
     }));
     (function drawFinal() {
       fctx.clearRect(0, 0, fc.width, fc.height);

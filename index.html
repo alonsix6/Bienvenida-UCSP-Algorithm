@@ -242,6 +242,7 @@
       opacity: 0;
       pointer-events: none;
       z-index: 2;
+      will-change: transform, opacity;
     }
     .l-num {
       font-family: var(--mono);
@@ -251,6 +252,7 @@
       margin-bottom: 20px;
       opacity: 0;
       transform: translateY(16px);
+      will-change: transform, opacity;
     }
     .l-name {
       font-family: var(--display);
@@ -264,6 +266,7 @@
     .l-name-inner {
       display: block;
       transform: translateY(110%);
+      will-change: transform;
     }
     .l-desc {
       font-family: var(--mono);
@@ -275,6 +278,7 @@
       opacity: 0;
       transform: translateY(12px);
       white-space: pre-line;
+      will-change: transform, opacity;
     }
     .l-bg-num {
       position: absolute;
@@ -783,31 +787,47 @@
   }
 
   // ── TYPEWRITER ──
+  // Driven by GSAP/rAF so updates batch with the rest of the frame; avoids
+  // setTimeout drift and per-char DOM insertions that cause layout thrash.
   function typewriter(elId, text, speed) {
-    speed     = speed || 22;
-    const el  = document.createElement('div'); // dummy; we use the real el below
+    speed = speed || 22; // ms per char
     const tgt = document.getElementById(elId);
-    const chars = text.split('');
-    let i = 0;
     tgt.textContent = '';
+
+    const textNode = document.createTextNode('');
+    tgt.appendChild(textNode);
 
     const caret = document.createElement('span');
     caret.className  = 'tw-cursor tw-blink';
     caret.textContent = '▋';
     tgt.appendChild(caret);
 
-    function tick() {
-      if (i < chars.length) {
-        tgt.insertBefore(document.createTextNode(chars[i++]), caret);
-        setTimeout(tick, speed);
-      } else {
-        // Hold cursor visible briefly, then fade it out
-        setTimeout(() => {
-          gsap.to(caret, { opacity: 0, duration: 0.4, onComplete: () => caret.remove() });
-        }, 1200);
-      }
-    }
-    tick();
+    const state = { i: 0 };
+    const total = text.length;
+    let last   = 0;
+
+    const tween = gsap.to(state, {
+      i: total,
+      duration: (total * speed) / 1000,
+      ease: 'none',
+      onUpdate: () => {
+        const n = state.i | 0;
+        if (n !== last) {
+          textNode.data = text.slice(0, n);
+          last = n;
+        }
+      },
+    });
+
+    return {
+      finish: () => {
+        tween.kill();
+        textNode.data = text;
+      },
+      removeCaret: () => {
+        if (caret.parentNode) caret.remove();
+      },
+    };
   }
 
   // ── SEQUENCE ──
@@ -847,23 +867,28 @@
     const layer = CONFIG.layers[n - 1];
     const tl    = gsap.timeline();
 
-    // Typewriter hold: typing time + breathing room before exit
-    const twHold = layer.desc.length * 0.022 + 1.5;
+    // typing time + breathing room before exit
+    const twHold = layer.desc.length * 0.022 + 1.2;
 
     tl.call(() => { canvasColor = layer.color; }) // sync color with canvas draw loop
       .set(`#l${n}`, { opacity: 1 })
       .to(`#l${n} .l-num`, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' })
       .to(`#al${n}`,       { width: 48,  duration: 0.5,  ease: 'power3.out' }, '-=0.2')
-      .to(`#ln${n}`,       { y: '0%',   duration: 0.9,  ease: 'power4.out' }, '-=0.2')
+      .to(`#ln${n}`,       { y: '0%',   duration: 0.9,  ease: 'power4.out', force3D: true }, '-=0.2')
       .call(() => {
         gsap.set(`#ld${n}`, { opacity: 1, y: 0 });
-        typewriter(`ld${n}`, layer.desc);
+        const el = document.getElementById(`ld${n}`);
+        el._tw = typewriter(`ld${n}`, layer.desc);
       }, null, '-=0.1')
       .to({}, { duration: twHold })
-      // Glitch only on desktop — feels wrong on touch screens
-      .call(() => { if (!isMobile) triggerGlitch(`l${n}`); })
-      .to({}, { duration: isMobile ? 0 : 0.12 })
-      .to(`#l${n}`, { opacity: 0, y: -20, duration: 0.55, ease: 'power3.in' });
+      // Clean caret + fire glitch in parallel with exit motion to avoid the
+      // dead beat between "glitch ends" and "exit starts"
+      .call(() => {
+        const el = document.getElementById(`ld${n}`);
+        if (el._tw) { el._tw.finish(); el._tw.removeCaret(); }
+        if (!isMobile) triggerGlitch(`l${n}`);
+      })
+      .to(`#l${n}`, { opacity: 0, y: -16, duration: 0.6, ease: 'power2.inOut', force3D: true });
 
     return tl;
   }

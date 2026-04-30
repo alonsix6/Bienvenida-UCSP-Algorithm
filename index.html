@@ -1025,8 +1025,9 @@
     const layer = CONFIG.layers[n - 1];
     const tl    = gsap.timeline();
 
-    // typing time + breathing room before exit
-    const twHold = layer.desc.length * 0.022 + 1.2;
+    // typing time + breathing room before exit (~1s extra so the
+    // description is comfortably readable before the layer leaves)
+    const twHold = layer.desc.length * 0.022 + 2.2;
 
     tl.call(() => { canvasColor = layer.particleColor || layer.color; }) // brightened canvas tone
       .set(`#l${n}`, { opacity: 1 })
@@ -1071,8 +1072,8 @@
       },
     });
 
-    // Estimated total: ~20s accounting for typewriter durations + overlap
-    gsap.to('#progress', { width: '100%', duration: 20, ease: 'none' });
+    // Estimated total: ~24s with the extra dwell + crossfade overlap
+    gsap.to('#progress', { width: '100%', duration: 24, ease: 'none' });
 
     // Slight crossfade between layers so any single-frame jank at the
     // boundary is masked by the next layer's intro already in motion.

@@ -17,8 +17,8 @@
     :root {
       --black:       #000000;
       --white:       #ffffff;
-      --accent:      #E8FF4D;
-      --accent-glow: rgba(232,255,77,0.15);
+      --accent:      #C5A572;
+      --accent-glow: rgba(197,165,114,0.15);
       --dim:         rgba(255,255,255,0.35);
       --display:     'Bebas Neue', sans-serif;
       --mono:        'JetBrains Mono', monospace;
@@ -55,12 +55,12 @@
     }
     #cursor.cta-hover {
       width: 52px; height: 52px;
-      background: rgba(232,255,77,0.22);
+      background: rgba(197,165,114,0.22);
     }
     #cursor-ring {
       position: fixed;
       width: 30px; height: 30px;
-      border: 1px solid rgba(232,255,77,0.35);
+      border: 1px solid rgba(197,165,114,0.35);
       border-radius: 50%;
       pointer-events: none;
       z-index: 9998;
@@ -69,7 +69,7 @@
     }
     #cursor-ring.hovered {
       width: 48px; height: 48px;
-      border-color: rgba(232,255,77,0.7);
+      border-color: rgba(197,165,114,0.7);
     }
 
     /* ── NOISE OVERLAY ── */
@@ -136,7 +136,7 @@
       transition: color 0.2s;
     }
     #audio-toggle:hover { color: rgba(255,255,255,0.6); }
-    #audio-toggle.active { color: rgba(232,255,77,0.7); }
+    #audio-toggle.active { color: rgba(197,165,114,0.7); }
 
     /* ── GATE ── */
     #gate {
@@ -368,7 +368,7 @@
     .f-corner::after {
       content: '';
       position: absolute;
-      background: rgba(232,255,77,0.55);
+      background: rgba(197,165,114,0.55);
     }
     .f-corner::before { width: 100%; height: 1px; }
     .f-corner::after  { width: 1px;  height: 100%; }
@@ -405,7 +405,7 @@
       width: 7px; height: 7px;
       background: var(--accent);
       border-radius: 50%;
-      box-shadow: 0 0 10px rgba(232,255,77,0.7);
+      box-shadow: 0 0 10px rgba(197,165,114,0.7);
       animation: f-pulse 1.6s ease-in-out infinite;
       flex-shrink: 0;
     }
@@ -570,12 +570,12 @@
     .f-btn::after {
       content: '';
       position: absolute; inset: -4px;
-      border: 1px solid rgba(232,255,77,0);
+      border: 1px solid rgba(197,165,114,0);
       transition: inset 0.3s, border-color 0.3s;
     }
     .f-btn:hover::after {
       inset: -10px;
-      border-color: rgba(232,255,77,0.3);
+      border-color: rgba(197,165,114,0.3);
     }
 
     /* ── MOBILE ── */
@@ -699,25 +699,29 @@
         num:   'CAPA 01 / 04',
         name:  'CAPTURA\nDE SEÑALES',
         desc:  'Monitoreo en tiempo real de plataformas\ndigitales, redes sociales y ecosistemas de medios.',
-        color: [232, 255, 77],
+        color:         [0, 36, 83],     // UCSP azul oscuro #002453 (brand ref)
+        particleColor: [60, 140, 240],  // brightened so particles read on black
       },
       {
         num:   'CAPA 02 / 04',
         name:  'INTELIGENCIA\nDE MERCADO',
         desc:  'Cruce de datos multi-fuente, análisis de\ncompetencia y detección de oportunidades.',
-        color: [77, 210, 255],
+        color:         [0, 59, 122],    // UCSP azul medio #003B7A
+        particleColor: [80, 165, 245],
       },
       {
         num:   'CAPA 03 / 04',
         name:  'ACTIVACIÓN\nESTRATÉGICA',
         desc:  'Transformación de insights en decisiones\naccionables y tácticas de alta precisión.',
-        color: [255, 88, 65],
+        color:         [107, 27, 61],   // UCSP borgoña #6B1B3D — color marca
+        particleColor: [220, 95, 145],
       },
       {
         num:   'CAPA 04 / 04',
         name:  'PERFORMANCE\nY OPTIMIZACIÓN',
         desc:  'Medición continua, aprendizaje adaptativo\ny ciclos de mejora basados en evidencia.',
-        color: [80, 255, 170],
+        color:         [197, 165, 114], // UCSP dorado #C5A572 — cierre
+        particleColor: [225, 200, 140],
       },
     ],
 
@@ -859,13 +863,13 @@
       .to('#g-btn',  { opacity: 1, duration: 0.6 }, '-=0.1');
 
     gsap.to('#g-btn', {
-      boxShadow: '0 0 20px rgba(232,255,77,0.12)',
+      boxShadow: '0 0 20px rgba(197,165,114,0.12)',
       repeat: -1, yoyo: true, duration: 2, delay: 2, ease: 'sine.inOut',
     });
   });
 
   // ── PARTICLES ──
-  let particles = [], canvasColor = [232, 255, 77];
+  let particles = [], canvasColor = [197, 165, 114];
   let animFrameId, canvas, ctx;
   const PARTICLE_COUNT = isMobile ? 30 : 90;
 
@@ -1024,7 +1028,7 @@
     // typing time + breathing room before exit
     const twHold = layer.desc.length * 0.022 + 1.2;
 
-    tl.call(() => { canvasColor = layer.color; }) // sync color with canvas draw loop
+    tl.call(() => { canvasColor = layer.particleColor || layer.color; }) // brightened canvas tone
       .set(`#l${n}`, { opacity: 1 })
       .to(`#l${n} .l-num`, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' })
       .to(`#al${n}`,       { width: 48,  duration: 0.5,  ease: 'power3.out' }, '-=0.2')
@@ -1132,7 +1136,7 @@
         if (p.y < 0 || p.y > fc.height) p.vy *= -1;
         fctx.beginPath();
         fctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        fctx.fillStyle = `rgba(232,255,77,${p.o})`;
+        fctx.fillStyle = `rgba(197,165,114,${p.o})`;
         fctx.fill();
       });
       requestAnimationFrame(drawFinal);
@@ -1198,7 +1202,7 @@
         opacity: 1, duration: 0.7, ease: 'power3.out',
         onComplete: () => {
           gsap.to('#f-btn', {
-            boxShadow: '0 0 40px rgba(232,255,77,0.3)',
+            boxShadow: '0 0 40px rgba(197,165,114,0.3)',
             repeat: -1, yoyo: true, duration: 2, ease: 'sine.inOut',
           });
         },

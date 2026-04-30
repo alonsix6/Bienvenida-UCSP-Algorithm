@@ -34,6 +34,14 @@
       cursor: none;
     }
 
+    /* Touch / mobile: restore the system cursor everywhere and hide the
+       custom dot+ring, which would otherwise sit stuck at (0,0). */
+    body.is-mobile,
+    body.is-mobile button,
+    body.is-mobile a { cursor: auto; }
+    body.is-mobile #cursor,
+    body.is-mobile #cursor-ring { display: none; }
+
     /* ── CURSOR ── */
     #cursor {
       position: fixed;
@@ -721,6 +729,7 @@
 
   // ── MOBILE DETECT ──
   const isMobile = navigator.maxTouchPoints > 1 || window.innerWidth < 768;
+  if (isMobile) document.body.classList.add('is-mobile');
 
   // ── DOM POPULATION FROM CONFIG ──
   document.getElementById('f-btn').href = CONFIG.algorithmUrl;
@@ -757,26 +766,31 @@
   })();
 
   // ── CURSOR ──
+  // Desktop only — on mobile the dot+ring are hidden via CSS and we skip
+  // the rAF loop and listeners entirely to save work.
   const curDot  = document.getElementById('cursor');
   const curRing = document.getElementById('cursor-ring');
-  let mx = 0, my = 0, rx = 0, ry = 0;
 
-  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  if (!isMobile) {
+    let mx = 0, my = 0, rx = 0, ry = 0;
 
-  (function tickCursor() {
-    curDot.style.left  = mx + 'px';
-    curDot.style.top   = my + 'px';
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    curRing.style.left = rx + 'px';
-    curRing.style.top  = ry + 'px';
-    requestAnimationFrame(tickCursor);
-  })();
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 
-  document.querySelectorAll('button, a').forEach(el => {
-    el.addEventListener('mouseenter', () => curRing.classList.add('hovered'));
-    el.addEventListener('mouseleave', () => curRing.classList.remove('hovered'));
-  });
+    (function tickCursor() {
+      curDot.style.left  = mx + 'px';
+      curDot.style.top   = my + 'px';
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      curRing.style.left = rx + 'px';
+      curRing.style.top  = ry + 'px';
+      requestAnimationFrame(tickCursor);
+    })();
+
+    document.querySelectorAll('button, a').forEach(el => {
+      el.addEventListener('mouseenter', () => curRing.classList.add('hovered'));
+      el.addEventListener('mouseleave', () => curRing.classList.remove('hovered'));
+    });
+  }
 
   // ── AUDIO ──
   // Procedural low-frequency hum via Web Audio API.
@@ -1207,7 +1221,8 @@
   }
 
   // ── CURSOR — CTA MAGNETIC ──
-  (function () {
+  // Skip on mobile: no hover, and the custom cursor refs are hidden anyway.
+  if (!isMobile) (function () {
     const btn = document.getElementById('f-btn');
 
     btn.addEventListener('mouseenter', () => {
